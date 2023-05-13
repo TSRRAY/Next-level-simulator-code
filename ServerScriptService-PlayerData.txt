@@ -1,0 +1,245 @@
+local Players = game:GetService("Players")
+local DataStoreService = game:GetService("DataStoreService")
+local RunService = game:GetService("RunService")
+local ServerStorage = game:GetSerstService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local Utils = require(ServerScriptService.Utils.Utils)
+local player = Players.localPlayer
+local dataStore = DataStoreService:GetDataStore("GameTest1")--Testing!!
+
+local toolConfig = require(ReplicatedStorage:FindFirstChild("Config"):FindFirstChild("ToolConfig"))
+local rankConfig = require(ReplicatedStorage:FindFirstChild("Config"):FindFirstChild("RankConfig"))
+local dnaConfig = require(ReplicatedStorage:FindFirstChild("Config"):FindFirstChild("DNAConfig"))
+
+
+local function waitForRequestBudget(requestType)
+	local currentBudget = DataStoreService:GetRequestBudgetForRequestType(requestType)
+	while currentBudget < 1 do
+		currentBudget = DataStoreService:GetRequestBudgetForRequestType(requestType)
+		task(5)
+	end
+end
+
+local function giveItems(player: Player)
+	local tool = player.inventory.EquippedTool.Value
+	repeat task.wait() until player.Character
+	
+	local toolClone = ServerStorage:FindFirstChild("Tools"):WaitForChild(tool):Clone()
+	toolClone.Parent = player.Backpack
+	
+	Utils.equipRank(player)
+end
+
+local function setupPlayerData(player: player)
+	local userID = player.UserId
+	local key = "Player_"..userID
+	
+	local leaderstats = Instance.new("Folder", player)
+	leaderstats.Name = "leaderstats"
+	
+	local code = Instance.new("IntValue", leaderstats)
+	code.Name = "Code"
+	code.Value = 0
+	
+	local crypto = Instance.new("IntValue", leaderstats)
+	crypto.Name = "Crypto"
+	crypto.Value = 9999
+	
+	local inventoryFolder = Instance.new("Folder", player)
+	inventoryFolder.Name = "inventory"
+	
+	local equippedTool = Instance.new("StringValue", inventoryFolder)
+	equippedTool.Name = "EquippedTool"
+	equippedTool.Value = "BrokenLaptop"
+	
+	local ownedToolsFolder = Instance.new("Folder", inventoryFolder)
+	ownedToolsFolder.Name = "OwnedTools"
+	
+	for _, toolTable in ipairs(toolConfig) do
+		local toolBoolean = Instance.new("BoolValue", ownedToolsFolder)
+		toolBoolean.Name = toolTable.ID
+		if toolTable.ID == "BrokenLaptop" then
+			toolBoolean.Value = true
+		else
+			toolBoolean.Value = false
+		end
+	end
+	
+	
+	local equippedRank = Instance.new("StringValue", inventoryFolder)
+	equippedRank.Name = "EquippedRank"
+	equippedRank.Value = "Noob"
+	
+	local ownedRanksFolder = Instance.new("Folder", inventoryFolder)
+	ownedRanksFolder.Name = "OwnedRanks"
+
+	for _, rankTable in ipairs(rankConfig) do
+		local rankBoolean = Instance.new("BoolValue", ownedRanksFolder)
+		rankBoolean.Name = rankTable.ID
+		if rankTable.ID == "Noob" then
+			rankBoolean.Value = true
+		else
+			rankBoolean.Value = false
+		end
+	end
+	
+	local equippedDNA = Instance.new("StringValue", inventoryFolder)
+	equippedDNA.Name = "EquippedDNA"
+	equippedDNA.Value = "SmallHardDrive"
+
+	local ownedDNAsFolder = Instance.new("Folder", inventoryFolder)
+	ownedDNAsFolder.Name = "OwnedDNAs"
+
+	for _, dnaTable in ipairs(dnaConfig) do
+		local dnaBoolean = Instance.new("BoolValue", ownedDNAsFolder)
+		dnaBoolean.Name = dnaTable.ID
+		if dnaTable.ID == "SmallHardDrive" then
+			dnaBoolean.Value = true
+		else
+			dnaBoolean.Value = false
+		end
+	end
+	
+	local success, returnValue
+	repeat
+		waitForRequestBudget(Enum.DataStoreRequestType.GetAsync)
+		success, returnValue = pcall(dataStore.GetAsync, dataStore, key)
+	until success or not Players:FindFirstChild(player.Name)
+	
+	
+	if success then
+		print(returnValue)
+		if returnValue ~= nil then
+
+		
+			code.Value = if returnValue.Code ~= nil then returnValue.Code else 0
+			crypto.Value = if returnValue.Crypto ~= nil then returnValue.Crypto else 0
+			player.inventory.EquippedTool.Value = if returnValue.Inventory.EquippedTool ~= nil then returnValue.Inventory.EquippedTool else "BrokenLaptop"
+		
+			for _, tool in ipairs(player.inventory.OwnedTools:GetChildren()) do
+				tool.Value = if returnValue.Inventory.OwnedTools[tool.Name] ~= nil then returnValue.Inventory.OwnedTools[tool.Name] else false
+			end
+		
+			player.inventory.EquippedRank.Value = if returnValue.Inventory.EquippedRank ~= nil then returnValue.Inventory.EquippedRank else "Noob"
+		
+			if returnValue.Inventory.OwnedRanks then
+				for _, rank in ipairs(player.inventory.OwnedRanks:GetChildren()) do
+					rank.Value = if returnValue.Inventory.OwnedRanks[rank.Name] ~= nil then returnValue.Inventory.OwnedRanks[rank.Name] else false
+			end
+		
+			player.inventory.EquippedDNA.Value = if returnValue.Inventory.EquippedDNA ~= nil then returnValue.Inventory.EquippedDNA else "SmallHardDrive"
+
+			if returnValue.Inventory.OwnedDNAs then
+				for _, dna in ipairs(player.inventory.OwnedDNAs:GetChildren()) do
+					dna.Value = if returnValue.Inventory.OwnedDNAs[dna.Name] ~= nil then returnValue.Inventory.OwnedDNAs[dna.Name] else false
+				end
+			end
+		end
+	end	
+			
+			
+			
+	else
+		player:Kick("There was an error loading your Data! Roblox's DataStore might me down, try again later, or contactus through our Group!")
+		print(player.Name.." Data Loading ERROR!!!")
+	end
+	
+	giveItems(player, player.inventory.EquippedTool.Value)
+
+end
+
+local function save(player)
+	local userID = player.UserId
+	local key = "Player_"..userID
+	
+	local code = player.leaderstats.Code.Value
+	local crypto = player.leaderstats.Crypto.Value
+	local equippedTool = player.inventory.EquippedTool.Value
+	
+	local ownedToolsTable = {}
+	for _, tool in ipairs(player.inventory.OwnedTools:GetChildren()) do
+		ownedToolsTable[tool.Name] = tool.Value
+	end
+	
+	local equippedRank = player.inventory.EquippedRank.Value
+
+	local ownedRanksTable = {}
+	for _, rank in ipairs(player.inventory.OwnedRanks:GetChildren()) do
+		ownedRanksTable[rank.Name] = rank.Value
+	end
+	
+	local equippedDNA = player.inventory.EquippedDNA.Value
+
+	local ownedDNAsTable = {}
+	for _, dna in ipairs(player.inventory.OwnedDNAs:GetChildren()) do
+		ownedDNAsTable[dna.Name] = dna.Value
+	end
+	
+	local dataTable = {
+		Code = code,
+		Crypto = crypto,
+		Inventory = {
+			EquippedTool = equippedTool,
+			OwnedTools = ownedToolsTable,
+			EquippedRank = equippedRank,
+			OwnedRanks = ownedRanksTable,
+			EquippedDNA = equippedDNA,
+			OwnedDNAs = ownedDNAsTable,
+		}
+	}
+	print(dataTable)
+	
+	local success, returnValue
+	repeat
+		waitForRequestBudget(Enum.DataStoreRequestType.UpdateAsync)
+		success, returnValue = pcall(dataStore.UpdateAsync, dataStore, key, function()
+			return dataTable
+		end)
+	until success
+	
+	
+	
+	if success then
+		print("Data Saved!")
+	else
+		print("Data Saving ERROR!!!")
+	end
+	
+end
+
+local function onShutdown()
+	if RunService:IsStudio() then
+		task.wait(2)
+	else
+		local finished = Instance.new("BindableEvent")
+		local allPlayers = Players:GetPlayers()
+		local leftPlayers = #allPlayers
+		
+		for _, player in ipairs(allPlayers) do
+			coroutine.wrap(function()
+				save(player)
+				leftPlayers -= 1
+				if leftPlayers == 0 then
+					finished:fire()
+				end
+			end)()
+		end
+		finished.Event:Wait()
+	end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+	coroutine.wrap(setupPlayerData)(player)
+end
+
+Players.PlayerAdded:Connect(setupPlayerData)
+Players.PlayerRemoving:Connect(save)
+game:BindToClose(onShutdown)
+
+while true do
+	task.wait(600)
+	for _, player in ipairs(Players:GetPlayers()) do
+		coroutine.wrap(save)(player)
+	end
+end

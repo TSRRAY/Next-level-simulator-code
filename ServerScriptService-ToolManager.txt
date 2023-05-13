@@ -1,0 +1,21 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+local ServerScriptSevice = game:GetService("ServerScriptService")
+
+local Stats = require(ServerScriptSevice.Utils.Stats)
+local Rewards = require(ServerScriptSevice.Utils.Rewards)
+local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+local tools = ServerStorage:FindFirstChild("Tools")
+local scripts = ServerStorage:FindFirstChild("Scripts")
+local toolConfig = require(ReplicatedStorage:FindFirstChild("Config"):FindFirstChild("ToolConfig"))
+
+remotes.ToolActivated.OnServerEvent:Connect(function(player: Player)
+	Rewards.Code(player, Stats.Code(player))
+	
+end)
+
+
+for _, tool in ipairs(tools:GetChildren()) do
+	local script = scripts.Click:Clone()
+	script.Parent = tool
+end

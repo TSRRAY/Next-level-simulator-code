@@ -1,0 +1,25 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local Rewards = require(ServerScriptService.Utils.Rewards)
+local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+local scriptableObjectsFolder = workspace:FindFirstChild("ScriptableObjects")
+
+scriptableObjectsFolder.Shop.ShopGuiOpen.Touched:Connect(function(part)
+	local player = Players:GetPlayerFromCharacter(part.Parent)
+	if player then
+		remotes.Shop.ShopOpen:FireClient(player)
+	end
+	
+end)
+
+scriptableObjectsFolder.Sell.ShopGuiOpen.Touched:Connect(function(part)
+	local player = Players:GetPlayerFromCharacter(part.Parent)
+	if player then
+		Rewards.Crypto(player, player.leaderstats.Code.Value, true)
+		player.leaderstats.Code.Value = 0
+
+	end
+
+end)
