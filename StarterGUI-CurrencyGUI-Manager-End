@@ -1,0 +1,54 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+local formatNumber = require(ReplicatedStorage:WaitForChild("Libs"):WaitForChild("FormatNumber"))
+local dnaConfig = require(ReplicatedStorage:WaitForChild("Config"):WaitForChild("DNAConfig"))
+
+local currencyGUI = script.Parent
+local currencyHolderFrame = currencyGUI:FindFirstChild("CurrencyHolder")
+local codeFrame = currencyHolderFrame:FindFirstChild("Code")
+local cryptoFrame = currencyHolderFrame:FindFirstChild("Crypto")
+
+local maxFood = 0
+
+local function setMaxCode()
+	for _, config in ipairs(dnaConfig) do
+		if config.ID == player.inventory.EquippedDNA.Value then
+			maxFood = config.Stat
+		end
+	end
+end
+
+local function changeValue(name: string, amount: number)
+
+	print(formatNumber.FormatInt(amount))
+	print(formatNumber.FormatStandard(amount))
+	print(formatNumber.FormatCompact(amount))
+	amount = formatNumber.FormatCompact(amount, 2)
+	if name == "Code" then
+		codeFrame.Amount.Text = amount.."/"..formatNumber.FormatCompact(maxFood)
+	elseif name == "Crypto" then
+		cryptoFrame.Amount.Text = amount
+
+	end
+end
+
+
+repeat wait(1) until player.leaderstats
+
+setMaxCode()
+changeValue("Code", player.leaderstats.Code.Value)
+changeValue("Crypto", player.leaderstats.Crypto.Value)
+
+player.leaderstats.Code.Changed:Connect(function()
+	changeValue("Code", player.leaderstats.Code.Value)
+	end)
+player.leaderstats.Crypto.Changed:Connect(function()
+	changeValue("Crypto", player.leaderstats.Crypto.Value)
+end)
+
+player.inventory.EquippedDNA.Changed:Connect(function()
+	setMaxCode()
+	changeValue("Code", player.leaderstats.Code.Value)
+end)
