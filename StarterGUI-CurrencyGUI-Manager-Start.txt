@@ -1,0 +1,40 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+
+local currencyGUI = script.Parent
+local currencyHolderFrame = currencyGUI:FindFirstChild("CurrencyHolder")
+local codeFrame = currencyHolderFrame:FindFirstChild("Code")
+local cryptoFrame = currencyHolderFrame:FindFirstChild("Crypto")
+
+local maxFood = 100
+
+local function changeValue(name: string, amount: number)
+
+	if name == "Code" then
+		codeFrame.Amount.Text = amount.."/100"
+	elseif name == "Crypto" then
+		cryptoFrame.Amount.Text = amount
+
+	end
+end
+
+repeat wait(1) until player.leaderstats
+
+
+changeValue("Code", player.leaderstats.Code.Value)
+changeValue("Crypto", player.leaderstats.Crypto.Value)
+
+player.leaderstats.Code.Changed:Connect(function()
+	changeValue("Code", player.leaderstats.Code.Value)
+	end)
+player.leaderstats.Crypto.Changed:Connect(function()
+	changeValue("Crypto", player.leaderstats.Crypto.Value)
+end)
+
+while true do
+	player.leaderstats.Code.Value += 1
+	player.leaderstats.Crypto.Value += 1
+	wait(1)
+end
