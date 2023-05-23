@@ -5,17 +5,17 @@ local player = Players.LocalPlayer
 
 local currencyGUI = script.Parent
 local currencyHolderFrame = currencyGUI:FindFirstChild("CurrencyHolder")
-local codeFrame = currencyHolderFrame:FindFirstChild("Code")
-local cryptoFrame = currencyHolderFrame:FindFirstChild("Crypto")
+local c1Frame = currencyHolderFrame:FindFirstChild("c1")
+local c2Frame = currencyHolderFrame:FindFirstChild("c2")
 
 local maxFood = 100
 
 local function changeValue(name: string, amount: number)
 
-	if name == "Code" then
-		codeFrame.Amount.Text = amount.."/100"
-	elseif name == "Crypto" then
-		cryptoFrame.Amount.Text = amount
+	if name == "c1" then
+		c1Frame.Amount.Text = amount.."/100"
+	elseif name == "c2" then
+		c2Frame.Amount.Text = amount
 
 	end
 end
@@ -23,18 +23,18 @@ end
 repeat wait(1) until player.leaderstats
 
 
-changeValue("Code", player.leaderstats.Code.Value)
-changeValue("Crypto", player.leaderstats.Crypto.Value)
+changeValue("c1", player.leaderstats.c1.Value)
+changeValue("c2", player.leaderstats.c2.Value)
 
-player.leaderstats.Code.Changed:Connect(function()
-	changeValue("Code", player.leaderstats.Code.Value)
+player.leaderstats.c1.Changed:Connect(function()
+	changeValue("c1", player.leaderstats.c1.Value)
 	end)
-player.leaderstats.Crypto.Changed:Connect(function()
-	changeValue("Crypto", player.leaderstats.Crypto.Value)
+player.leaderstats.c2.Changed:Connect(function()
+	changeValue("c2", player.leaderstats.c2.Value)
 end)
 
 while true do
-	player.leaderstats.Code.Value += 1
-	player.leaderstats.Crypto.Value += 1
+	player.leaderstats.c1.Value += 1
+	player.leaderstats.c2.Value += 1
 	wait(1)
 end
