@@ -7,6 +7,6 @@ local tools = ServerStorage:FindFirstChild("Tools")
 local scripts = ServerStorage:FindFirstChild("Scripts")
 
 remotes.ToolActivated.OnServerEvent:Connect(function(player: Player)
-	player.leaderstats.Points.Value = player.leaderstats.Points.Value + 1
-	
+	player.leaderstats.c1.Value = player.leaderstats.c1.Value + 1
+
 end)
