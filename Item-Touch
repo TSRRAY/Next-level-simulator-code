@@ -1,0 +1,26 @@
+local Players = game:GetService("Players")
+local scriptableObjectsFolder = workspace:FindFirstChild("ScriptableObjects")
+local ServerScriptService = game:GetService("ServerScriptService")
+local part = script.Parent
+local currencyValue = 1
+local player = Players.LocalPlayer
+
+
+local db = true
+script.Parent.Touched:connect(function(hit)
+	if hit.Parent:FindFirstChild("Humanoid") ~= nil then
+		if db == true then
+			db = false
+			script.Parent.Transparency = 1
+			script.Parent.CanCollide = false
+			script.Parent.CanTouch = false
+			local player = game.Players:GetPlayerFromCharacter(hit.Parent)
+			player.leaderstats.c1.Value = player.leaderstats.c1.Value + currencyValue
+			wait(math.random(2,7))
+			script.Parent.Transparency = 0
+			script.Parent.CanCollide = true
+			script.Parent.CanTouch = true
+			db = true
+		end
+	end	
+end)
