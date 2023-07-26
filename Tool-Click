@@ -1,0 +1,8 @@
+local Players = game:GetService("Players")
+local tool = script.Parent
+local currencyValue = 1
+local player = Players.LocalPlayer
+
+tool.Activated:Connect(function()
+	player.leaderstats.c1.Value += currencyValue
+end)

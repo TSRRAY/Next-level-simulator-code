@@ -1,9 +1,0 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local remotes = ReplicatedStorage:FindFirstChild("Remotes")
-
-local tool = script.Parent
-
-tool.Activated:Connect(function()
-	remotes.ToolActivated:FireServer()
-end)
