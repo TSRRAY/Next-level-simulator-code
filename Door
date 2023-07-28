@@ -1,0 +1,19 @@
+local ID = 217280976
+local Player = game.Players.LocalPlayer
+local pad = game.Workspace.MorphShopWall1
+local MarketplaceService = game:GetService("MarketplaceService")
+
+local function Teleport(player)
+	Player.Character.HumanoidRootPart.CFrame = pad.CFrame + Vector3.new(0,0,0)
+end
+if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(Player.UserId, ID) then
+	pad.CanCollide = false
+else
+	pad.CanCollide = true
+end
+pad.Touched:Connect(function()
+	if MarketplaceService:UserOwnsGamePassAsync(Player.UserId, ID) then
+	else
+		game:GetService("MarketplaceService"):PromptGamePassPurchase(Player, ID)
+	end	
+end)
