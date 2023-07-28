@@ -1,0 +1,30 @@
+local GUI = script.Parent
+local Frame = GUI:FindFirstChild("Frame")
+local Button = Frame:FindFirstChild("Money")
+local Exit = Frame:FindFirstChild("Exit")
+local Player = game.Players.LocalPlayer
+
+local ServerScriptService = game:GetService("ServerScriptService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+
+local ClickValue = 1
+
+Button.MouseButton1Click:Connect(function()
+	remotes.Clicked:FireServer()
+	print("Clicked")
+end)
+
+remotes.ChairTouched.OnClientEvent:Connect(function()
+	print("worked")
+	if GUI.Enabled == false then
+		GUI.Enabled = true
+	end
+end)
+
+Exit.MouseButton1Click:Connect(function()
+	if GUI.Enabled == true then
+		GUI.Enabled = false
+	end
+end)
