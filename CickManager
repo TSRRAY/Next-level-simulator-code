@@ -1,0 +1,15 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+local ServerScriptSevice = game:GetService("ServerScriptService")
+
+local Stats = require(ServerScriptSevice.Utils.Stats)
+local Rewards = require(ServerScriptSevice.Utils.Rewards)
+local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+local toolConfig = require(ReplicatedStorage:FindFirstChild("Config"):FindFirstChild("ToolConfig"))
+
+CurrencyValue = 1
+
+remotes.Clicked.OnServerEvent:Connect(function(player: Player)
+	Rewards.Code(player, CurrencyValue, 1)
+	print("worked")
+end)
